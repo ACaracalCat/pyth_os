@@ -3,6 +3,10 @@ import src.vfs as vfs
 
 def readln():
     ln = input(f"{vfs.pwd()} pyth_os % ")
+
+    if len(ln) < 1:
+        return
+
     args = ln.split()[1:]
     cmd = ln.split()[0]
 
