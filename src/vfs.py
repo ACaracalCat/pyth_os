@@ -1,6 +1,5 @@
-from typing import Union, Dict, Any
+from typing import Dict, Any
 
-File = Dict[str, str]
 Folder = Dict[str, Any]
 
 fs: Folder = {
@@ -11,7 +10,6 @@ fs: Folder = {
 }
 
 path = ["root"]
-
 extensions = [".txt"]
 
 def _rd():
@@ -26,13 +24,11 @@ def tree(d=None, pre=""):
     for name, f in d.items():
         print(pre + name)
         if isinstance(f, dict) and "content" not in f:
-            tree(f, pre + " ")
+            tree(f, pre + "  ")
 
 def ls():
-    dir = _rd()
-    for name in dir:
+    for name in _rd():
         print(name)
-
 
 def pwd():
     return "/" + "/".join(path)
@@ -42,52 +38,83 @@ def cd(f: str):
     if f == "..":
         if path != ["root"]:
             path.pop()
-    elif f in dir:
-        if "content" not in dir[f]:
-            path.append(f)
-        else:
-            print(f"can't cd into a file: {f}")
-    else:
-        print(f"file not found: {pwd()}/{f}")
+        return
+    if f not in dir:
+        print(f"pyth_os: cd: {f}: No such file or directory")
+        return
+    if "content" in dir[f]:
+        print(f"pyth_os: cd: {f}: Not a directory")
+        return
+    path.append(f)
 
-def touch(f):
+def touch(f: str):
     dir = _rd()
     if path == ["root"]:
-        print(f"cannot create {f} at /root")
-    elif f in dir:
-        print(f"{f} already exists")
-    elif not any(f.endswith(e) for e in extensions):
-        print(f"unknown file extension: {f}")
-    else:
-        dir[f] = {"content": ""}
+        print(f"pyth_os: touch: cannot create file '{f}' in '/root'")
+        return
+    if f in dir:
+        print(f"pyth_os: touch: cannot create file '{f}': File exists")
+        return
+    if not any(f.endswith(e) for e in extensions):
+        print(f"pyth_os: touch: unknown file type '{f}'")
+        return
+    dir[f] = {"content": ""}
 
-def mkdir(f):
+def mkdir(f: str):
     dir = _rd()
     if path == ["root"]:
-        print(f"cannot create {f} at /root")
-    elif f in dir:
-        print(f"{f} already exists")
-    elif any(f.endswith(e) for e in extensions):
-        print(f"folder cannot have file extension: {f}")
-    else:
-        dir[f] = {}
-
-def write(f, c):
-    dir = _rd()
+        print(f"pyth_os: mkdir: cannot create directory '{f}' in '/root'")
+        return
+    if f in dir:
+        print(f"pyth_os: mkdir: cannot create directory '{f}': File exists")
+        return
     if any(f.endswith(e) for e in extensions):
-        dir[f] = {"content": c}
-    else:
-        print(f"cannot write to a folder: {f}")
+        print(f"pyth_os: mkdir: invalid directory name '{f}'")
+        return
+    dir[f] = {}
+
+def write(f: str, c: str):
+    dir = _rd()
+    if f not in dir:
+        print(f"pyth_os: {f}: No such file")
+        return
+    if "content" not in dir[f]:
+        print(f"pyth_os: {f}: Is a directory")
+        return
+    dir[f]["content"] = c
 
 def cat(f: str):
     dir = _rd()
     if f not in dir:
-        print(f"file not found: {f}")
+        print(f"pyth_os: cat: {f}: No such file or directory")
         return
+    if "content" not in dir[f]:
+        print(f"pyth_os: cat: {f}: Is a directory")
+        return
+    print(dir[f]["content"])
 
+def rm(f: str, t=None):
+    dir = _rd()
+    if f not in dir:
+        print(f"pyth_os: rm: cannot remove '{f}': No such file or directory")
+        return
+    if "content" not in dir[f]:
+        if t == "-r" or not dir[f]:
+            del dir[f]
+        else:
+            print(f"pyth_os: rm: cannot remove '{f}': Is a directory")
+        return
+    del dir[f]
+
+def rmdir(f: str):
+    dir = _rd()
+    if f not in dir:
+        print(f"pyth_os: rmdir: failed to remove '{f}': No such file or directory")
+        return
     if "content" in dir[f]:
-        print(dir[f]["content"])
-    else:
-        print(f"cannot view content of folder: {f}")
-
-
+        print(f"pyth_os: rmdir: failed to remove '{f}': Not a directory")
+        return
+    if dir[f]:
+        print(f"pyth_os: rmdir: failed to remove '{f}': Directory not empty")
+        return
+    del dir[f]
