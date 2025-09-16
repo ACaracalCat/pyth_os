@@ -2,7 +2,7 @@ from .cmds import cmds
 import src.vfs as vfs
 
 def readln():
-    ln = input(f"{vfs.pwd()} pyth_os % ")
+    ln = input(f"{vfs.pwd()} pyth_os % ") # Placeholder@py-linux:~/Documents$ 
 
     if len(ln) < 1:
         return
